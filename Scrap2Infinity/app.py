@@ -26,7 +26,8 @@ app.config['UPLOAD_FOLDER'] = os.path.abspath(r"./Scrap2Infinity/static/uploads"
 
 
 app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
-app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
+# app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
+app.config["result_backend"] = os.environ["REDIS_URL"]
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 
 app.config["ZIP-PATH"] = []
