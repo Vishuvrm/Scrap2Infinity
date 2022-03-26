@@ -18,18 +18,17 @@ import uuid as uuid
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'top-secret!'
-app.config['UPLOAD_FOLDER'] = os.path.abspath(r"./Scrap2Infinity/static/uploads")
-
+app.config['UPLOAD_FOLDER'] = r"./Scrap2Infinity/static/uploads"
 # Celery configuration
-# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
-# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
-# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/uploads"
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/uploads"
 
 
-app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
-# app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
-app.config["result_backend"] = os.environ["REDIS_URL"]
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
+# app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
+# # app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
+# app.config["result_backend"] = os.environ["REDIS_URL"]
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
 
 app.config["ZIP-PATH"] = []
 app.config["num_uploads"] = 0
@@ -154,7 +153,7 @@ def handle_images(self, img, qty, image_name, location_to_save, full_path, zip_p
     meta={"current": 100, "filename": image_name,
           "zip_path": zip_path, "download_as": img,
           "total": total, "status": f"Zipped images ready to download!",
-          "result": False}
+          "result": "SUCCESS"}
 
     return meta
 
@@ -227,6 +226,8 @@ def taskstatus(task_id):
             response["zip_path"] = task.info["zip_path"]
             response["download_as"] = task.info["download_as"]
             filename = task.info["filename"]
+            response["zip_name"] = os.path.basename(response["zip_path"])
+
             upload = UploadData.query.filter_by(filename=filename).first()
             data = upload.data
             writeTofile(data, task.info["zip_path"])

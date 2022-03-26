@@ -122,8 +122,10 @@
                         //link = $("<a id="test" href="#" download="{{img}}" target="_blank">Download images here!</a>")
                         //document.getElementById('downloader').innerHTML = "<a id="test" href="#" download="{{img}}" target="_blank">Download images here!</a>"
 
+                        var zip_name = data["zip_name"]
+                        var file_loc = "static/uploads/"+zip_name
                         var a = document.createElement('a');
-                        a.setAttribute('href',zip_path);
+                        a.setAttribute('href',file_loc);
                         a.setAttribute('download',download_as);
                         //a.setAttribute('onclick', delete_zip.apply_async([zip_path])
                         a.innerHTML = "Download here";
