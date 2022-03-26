@@ -5,6 +5,7 @@ import time
 
 from flask import Flask, request, render_template, session, flash, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.postgresql import BYTEA
 from flask_migrate import Migrate
 # import mysql.connector
 from celery import Celery
@@ -45,7 +46,7 @@ celery.conf.update(app.config)
 # Create table models
 class UploadData(db.Model):
     filename = db.Column(db.String(200), nullable=False, primary_key=True)
-    data = db.Column(db.BYTEA)
+    data = db.Column(BYTEA())
 
 # def create_db(host="localhost", user="root", passwd="passwd", db="uploads"):
 #     mydb = mysql.connector.connect(host="localhost",
