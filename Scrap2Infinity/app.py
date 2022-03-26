@@ -97,7 +97,9 @@ def writeTofile(data, filename):
     # Convert binary data to proper format and write it on Hard Disk
     with open(filename, 'wb') as file:
         file.write(data)
+        file.close()
     print("Stored blob data into: ", filename, "\n")
+    print("Does file exists? ", os.path.exists(filename))
 
 @celery.task(bind=True)
 def handle_images(self, img, qty, image_name, location_to_save, full_path, zip_path):
@@ -149,7 +151,10 @@ def handle_images(self, img, qty, image_name, location_to_save, full_path, zip_p
     # file = dill.dumps(file, recurse=True)
     # dill.loads(file)
 
-    meta={"current": 100, "filename": image_name, "zip_path": zip_path, "download_as": img, "total": total, "status": f"Zipped images ready to download!", "result": "The images will disappear after 10 minutes. Please download them now!"}
+    meta={"current": 100, "filename": image_name,
+          "zip_path": zip_path, "download_as": img,
+          "total": total, "status": f"Zipped images ready to download!",
+          "result": False}
 
     return meta
 
