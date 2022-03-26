@@ -1,4 +1,4 @@
-from Scrap2Infinity.app import app
+from Scrap2Infinity.app import app, UploadData
 from flask_apscheduler import APScheduler
 #
 # # initialize scheduler
@@ -10,6 +10,9 @@ scheduler.init_app(app)
 def auto_uploads_clear():
     for file in os.listdir(app.config['UPLOAD_FOLDER']):
         os.remove(os.path.join(os.path.abspath(app.config['UPLOAD_FOLDER']), file))
+
+    UploadData.query.filter_by().delete()
+
     print("Cleared all files!")
 
 scheduler.start()
