@@ -40,15 +40,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'top-secret!'
 app.config['UPLOAD_FOLDER'] = r"./Scrap2Infinity/static/uploads"
 # Celery configuration
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/uploads"
+# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/uploads"
 
 
-# app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
-# # app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
-# app.config["result_backend"] = os.environ["REDIS_URL"]
-# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
+app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
+# app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
+app.config["result_backend"] = os.environ["REDIS_URL"]
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
 
 
 app.config["ZIP-PATH"] = ""
