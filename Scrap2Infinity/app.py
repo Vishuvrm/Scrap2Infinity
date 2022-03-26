@@ -45,7 +45,7 @@ celery.conf.update(app.config)
 # Create table models
 class UploadData(db.Model):
     filename = db.Column(db.String(200), nullable=False, primary_key=True)
-    data = db.Column(db.BLOB)
+    data = db.Column(db.BYTEA)
 
 # def create_db(host="localhost", user="root", passwd="passwd", db="uploads"):
 #     mydb = mysql.connector.connect(host="localhost",
