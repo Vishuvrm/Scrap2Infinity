@@ -48,7 +48,7 @@ app.config['UPLOAD_FOLDER'] = r"./Scrap2Infinity/static/uploads"
 app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
 # app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
 app.config["result_backend"] = os.environ["REDIS_URL"]
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"].replace("postgres", "postgresql")
 
 
 app.config["ZIP-PATH"] = ""
