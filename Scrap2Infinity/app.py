@@ -288,7 +288,7 @@ def delete(response):
     else:
         zip_path = app.config["ZIP-PATH"]
         print("ZIP-PATH =", zip_path)
-        print("ZIP PATH IS AVAILABLE OR NOT? ", os.path.exists(zip_path[0]))
+        # print("ZIP PATH IS AVAILABLE OR NOT? ", os.path.exists(zip_path[0]))
         # delete_zip.apply_async([zip_path])
         # p = Process(target=remove_zip, args=(zip_path,))
         # p.start()
