@@ -21,15 +21,15 @@ app.config['SECRET_KEY'] = 'top-secret!'
 app.config['UPLOAD_FOLDER'] = os.path.abspath(r"./Scrap2Infinity/static/uploads")
 
 # Celery configuration
-# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
-# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
-# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/uploads"
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/uploads"
 
 
-app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
-# app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
-app.config["result_backend"] = os.environ["REDIS_URL"]
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
+# app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
+# # app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
+# app.config["result_backend"] = os.environ["REDIS_URL"]
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
 
 app.config["ZIP-PATH"] = []
 app.config["num_uploads"] = 0
@@ -179,7 +179,7 @@ def longtask():
             sec_img_name = secure_filename(img)
             image_name = f"{uuid.uuid1()}_{sec_img_name}"
 
-            location_to_save = os.path.abspath(r"./static/uploads")
+            location_to_save = app.config['UPLOAD_FOLDER']
             full_path = os.path.join(location_to_save, image_name)
             zip_path = f"{full_path}.zip"
             app.config["ZIP-PATH"].append(zip_path)
