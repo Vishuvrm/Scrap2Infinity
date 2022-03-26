@@ -56,13 +56,13 @@ app.config["ZIP-PATH"] = ""
 
 # app.config["tasks"] = []
 
-# # Initialize the database
-# db = SQLAlchemy(app)
-#
-# # Create table models
-# class UploadData(db.Model):
-#     filename = db.Column(db.String(200), nullable=False, primary_key=True)
-#     data = db.Column(BYTEA())
+# Initialize the database
+db = SQLAlchemy(app)
+
+# Create table models
+class UploadData(db.Model):
+    filename = db.Column(db.String(200), nullable=False, primary_key=True)
+    data = db.Column(BYTEA())
 
 # Initialize Celery
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
@@ -79,7 +79,7 @@ celery.conf.update(app.config)
 
 # create_db()
 # Migrate the changes to the database
-# migrate = Migrate(app, db)
+migrate = Migrate(app, db)
 
 
 # Clearing the uploads regularly
@@ -128,7 +128,7 @@ def handle_images(self, img, qty, image_name, location_to_save, full_path, zip_p
     # location_to_save = r"static/uploads"
     self.update_state(state="PROGRESS", meta={'current': 25, 'total': total, 'status': "Fetching images url"})
 
-    urls = fetch_image_urls(img, qty, get_selenium(), 2)
+    urls = fetch_image_urls(img, qty, get_selenium(), 1)
 
     self.update_state(state="PROGRESS", meta={'current': 50, 'total': total, 'status': f"URLs for {qty} images fetched!"})
 
@@ -141,14 +141,14 @@ def handle_images(self, img, qty, image_name, location_to_save, full_path, zip_p
     self.update_state(state="PROGRESS", meta={'current': 90, 'total': total,
                                               'status': f"Uploading the zip folder to the online database"})
 
-    # with open(zip_path, "rb") as file:
-    #     data = file.read()
-    #     file.close()
-    # upload = UploadData(filename=image_name, data=data)
-    # db.session.add(upload)
-    # db.session.commit()
+    with open(zip_path, "rb") as file:
+        data = file.read()
+        file.close()
+    upload = UploadData(filename=image_name, data=data)
+    db.session.add(upload)
+    db.session.commit()
 
-    # os.remove(zip_path)
+    os.remove(zip_path)
 
 
     # full_path = os.path.join(location_to_save, image_name)
@@ -248,11 +248,11 @@ def taskstatus(task_id):
             filename = task.info["filename"]
             response["zip_name"] = os.path.basename(response["zip_path"])
 
-            # upload = UploadData.query.filter_by(filename=filename).first()
-            # data = upload.data
-            # writeTofile(data, task.info["zip_path"])
-            # UploadData.query.filter_by(filename=filename).delete()
-            # db.session.commit()
+            upload = UploadData.query.filter_by(filename=filename).first()
+            data = upload.data
+            writeTofile(data, task.info["zip_path"])
+            UploadData.query.filter_by(filename=filename).delete()
+            db.session.commit()
             # zip_file = task.info["zip_file"][1:]
             # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
             # print(zip_file)
