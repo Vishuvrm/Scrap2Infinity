@@ -5,6 +5,7 @@ import time
 
 from flask import Flask, request, render_template, session, flash, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+# from flask_apscheduler import APScheduler
 from sqlalchemy.dialects.postgresql import BYTEA
 from flask_migrate import Migrate
 # import mysql.connector
@@ -16,36 +17,56 @@ import shutil
 from werkzeug.utils import secure_filename
 import uuid as uuid
 
+
+
+# set configuration values
+# class Config:
+#     SCHEDULER_API_ENABLED = True
+
+# Create app
 app = Flask(__name__)
+# app.config.from_object(Config())
+
+# # initialize scheduler
+# scheduler = APScheduler()
+# scheduler.api_enabled = True
+# scheduler.init_app(app)
+# scheduler.start()
+#
+# @scheduler.task("interval", id="auto_uploads_clear",seconds=5, misfire_grace_time=900)
+# def auto_uploads_clear():
+#     print("JOB auto_uploads_clear is executed!")
+
 app.config['SECRET_KEY'] = 'top-secret!'
 app.config['UPLOAD_FOLDER'] = r"./Scrap2Infinity/static/uploads"
 # Celery configuration
-# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
-# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
-# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/uploads"
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/uploads"
 
 
-app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
-# app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
-app.config["result_backend"] = os.environ["REDIS_URL"]
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
+# app.config['CELERY_BROKER_URL'] = os.environ["REDIS_URL"]
+# # app.config['CELERY_RESULT_BACKEND'] = os.environ["REDIS_URL"]
+# app.config["result_backend"] = os.environ["REDIS_URL"]
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["UPDATED_DATABASE_URL"]
 
-app.config["ZIP-PATH"] = []
-app.config["num_uploads"] = 0
 
-app.config["tasks"] = []
+app.config["ZIP-PATH"] = ""
+# app.config["num_uploads"] = 0
+
+# app.config["tasks"] = []
 
 # Initialize the database
 db = SQLAlchemy(app)
-
-# Initialize Celery
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-celery.conf.update(app.config)
 
 # Create table models
 class UploadData(db.Model):
     filename = db.Column(db.String(200), nullable=False, primary_key=True)
     data = db.Column(BYTEA())
+
+# Initialize Celery
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
 # def create_db(host="localhost", user="root", passwd="passwd", db="uploads"):
 #     mydb = mysql.connector.connect(host="localhost",
@@ -157,16 +178,15 @@ def handle_images(self, img, qty, image_name, location_to_save, full_path, zip_p
 
     return meta
 
-@celery.task(bind=True)
-def delete_zip(self, zip_path):
-    time.sleep(15)
+def delete_zip(zip_path):
+    # time.sleep(15)
     os.remove(zip_path)
     print("Remove the zip path!")
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     signal = create_empty_static()
-    clear_uploads()
+    # clear_uploads()
 
     if request.method == 'GET':
         return render_template('index.html', signal = signal)
@@ -178,29 +198,29 @@ def longtask():
     if request.method == "POST":
         # data = (request.form["data"])
         signal = create_empty_static()
-        if app.config["num_uploads"] < 5:
-            img = request.form["img"]
-            sec_img_name = secure_filename(img)
-            image_name = f"{uuid.uuid1()}_{sec_img_name}"
+        # if app.config["num_uploads"] < 5:
+        img = request.form["img"]
+        sec_img_name = secure_filename(img)
+        image_name = f"{uuid.uuid1()}_{sec_img_name}"
 
-            location_to_save = app.config['UPLOAD_FOLDER']
-            full_path = os.path.join(location_to_save, image_name)
-            zip_path = f"{full_path}.zip"
-            app.config["ZIP-PATH"].append(zip_path)
+        location_to_save = app.config['UPLOAD_FOLDER']
+        full_path = os.path.join(location_to_save, image_name)
+        zip_path = f"{full_path}.zip"
+        app.config["ZIP-PATH"] = zip_path
 
-            qty = request.form["qty"]
-            task = handle_images.apply_async([img, int(qty), image_name, location_to_save, full_path, zip_path]) # or long_task.delay()
-            # meta = task.result
-            # zip_content = meta["zip_content"]
-            # zip_content.save(zip_path)
-            # with open(zip_path, "wb") as file:
-            #     file.write(zip_content)
-            #     file.close()
+        qty = request.form["qty"]
+        task = handle_images.apply_async([img, int(qty), image_name, location_to_save, full_path, zip_path]) # or long_task.delay()
+        # meta = task.result
+        # zip_content = meta["zip_content"]
+        # zip_content.save(zip_path)
+        # with open(zip_path, "wb") as file:
+        #     file.write(zip_content)
+        #     file.close()
 
-            app.config["num_uploads"] += 1
-            celery.conf.update(app.config)
-            return jsonify({}), 202, {'Location': url_for('taskstatus',
-                                                          task_id=task.id)}
+        # app.config["num_uploads"] += 1
+        celery.conf.update(app.config)
+        return jsonify({}), 202, {'Location': url_for('taskstatus',
+                                                      task_id=task.id)}
 
 
 
@@ -271,31 +291,31 @@ def remove_zip(zip_path):
 #     p.start()
 #     print("Remove the zip path!")
 
-@app.after_request
-def delete(response):
-    response.direct_passthrough = False
-    response_value = response.get_data()
+# @app.after_request
+# def delete(response):
+#     response.direct_passthrough = False
+#     response_value = response.get_data()
+#
+#     try:
+#         decoded_response = response_value.decode('utf-8').replace(r'\n', '')
+#         response_type = eval(f"type({decoded_response})")
+#     except SyntaxError:
+#         response_type = str
+#     except UnicodeDecodeError:
+#         response_type = str
+#     if ((rb"<html>" in response_value) or (response_type == dict)):
+#         pass
+#     else:
+#         zip_path = app.config["ZIP-PATH"]
+#         print("ZIP-PATH =", zip_path)
+#         # print("ZIP PATH IS AVAILABLE OR NOT? ", os.path.exists(zip_path[0]))
+#         delete_zip(zip_path)
+#         # p = Process(target=remove_zip, args=(zip_path,))
+#         # p.start()
+#         # print("Removed the zip path!")
 
-    try:
-        decoded_response = response_value.decode('utf-16').replace(r'\n', '')
-        response_type = eval(f"type({decoded_response})")
-    except SyntaxError:
-        response_type = str
-    except UnicodeDecodeError:
-        response_type = str
-    if ((rb"<html>" in response_value) or (response_type == dict)):
-        pass
-    else:
-        zip_path = app.config["ZIP-PATH"]
-        print("ZIP-PATH =", zip_path)
-        # print("ZIP PATH IS AVAILABLE OR NOT? ", os.path.exists(zip_path[0]))
-        # delete_zip.apply_async([zip_path])
-        # p = Process(target=remove_zip, args=(zip_path,))
-        # p.start()
-        # print("Removed the zip path!")
 
-
-    return response
+    # return response
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -31,14 +31,14 @@ def get_selenium():
     # options.add_argument("window-size=1400,600")
 
     # For making the app independent of chrome driver files
-    # s = Service(ChromeDriverManager().install())
-    # driver = webdriver.Chrome(service=s, chrome_options=chrome_options)
-    # options = webdriver.ChromeOptions()
-    # options.add_argument("headless")
+    s = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=s, chrome_options=chrome_options)
+    options = webdriver.ChromeOptions()
+    options.add_argument("headless")
     # driver.maximize_window()
     # time.sleep(3)
 
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    # driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 
     driver.delete_all_cookies()
     # time.sleep(3)
