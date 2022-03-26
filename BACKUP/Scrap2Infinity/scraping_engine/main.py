@@ -105,9 +105,6 @@ def fetch_image_urls(query: str, max_links_to_fetch: int, wd: webdriver, sleep_b
 
         return image_urls
 
-
-# if __name__ == "__main__":
-#     fetch_image_urls("Bro", 120, get_selenium())
     #     print(img)
 # Fix infinite scrolling
 # selenium = get_selenium()

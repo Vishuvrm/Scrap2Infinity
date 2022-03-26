@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scrap2Infinity</title>
+    <style>
+        .progress {
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Google Image Scrapper</h1>
+    {% for message in get_flashed_messages() %}
+    <p style="color: red;">{{ message }}</p>
+    {% endfor %}
+
+    <hr>
+    <h2>Scrap and download any number of images from google</h2>
+    <!--<button onclick="start_long_task();">Start Long Calculation</button><br><br>-->
+    <h4>Just type the image name and the no. of images, and you are done!</h4>
+
+    <form method="POST" id="start-bg-job">
+      <label for="image">Image name:</label><br>
+      <input type="text" id="image" name="image" required="required"><br><br>
+      <label for="qty">Number of images:</label><br>
+      <input type="text" id="qty" name="qty" required="required"><br><br>
+      <button type="submit">Download google images</button>
+
+<!--      <button type="submit" id="start-bg-job">Start Long Calculation</button><br><br>-->
+    </form>
+
+    <div id="progress"></div>
+<!--    <div id="downloader"></div>-->
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/nanobar/0.2.1/nanobar.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script>
+
+        //$(document).ready(function(){
+          //$("start-bg-job").on("submit", function(event){
+                  // Prevent default action by the form
+            //      event.preventDefault();
+
+                  // Get the form data
+              //    image = $("#image").val();
+                //  qty = $("#qty").val();
+
+                  // Start the function
+                  //start_long_task(image, qty);
+
+          //});
+        //});
+
+        //document.getElementbyId("start-bg-job").addEventListener("submit", start_long_task)
+
+        function start_long_task(event) {
+
+            // Prevent default action by the form
+            event.preventDefault();
+
+            // Get the form data
+            //var image = $("#image").val();
+            //var qty = $("#qty").val();
+
+
+            //var xhr = new XMLHttpRequest();
+            //xhr.open("post", "/longtask", true);
+            //xhr.setRequestHeader("Content-type", "application/json");
+
+            // add task status elements
+            div = $('<div class="progress"><div></div><div>0%</div><div>...</div><div>&nbsp;</div></div><hr>');
+            $('#progress').append(div);
+
+            // create a progress bar
+            var nanobar = new Nanobar({
+                bg: '#44f',
+                target: div[0].childNodes[0]
+            });
+
+            // send ajax POST request to start background job
+            $.ajax({
+                type: 'POST',
+                data: {
+                        img: $("#image").val(),
+                        qty: $("#qty").val(),
+                       },
+                url: '/longtask',
+                success: function(data, status, request) {
+                    status_url = request.getResponseHeader('Location');
+                    update_progress(status_url, nanobar, div[0]);
+                },
+                error: function() {
+                    alert("Can't download more than 5 images! Please refresh the page to download more...");
+                }
+            });
+        }
+        function update_progress(status_url, nanobar, status_div) {
+            // send GET request to status URL
+            $.getJSON(status_url, function(data) {
+                // update UI
+                percent = parseInt(data['current'] * 100 / data['total']);
+                nanobar.go(percent);
+                $(status_div.childNodes[1]).text(percent + '%');
+                $(status_div.childNodes[2]).text(data['status']);
+                if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                    if ('result' in data) {
+                        // show result
+                        //$(status_div.childNodes[3]).text(data['result']);
+                        //$(status_div.childNodes[3]).text('Result: ' + "Download link");
+                        //$(status_div.childNodes[3]).text('Zip-Path: ' + data["zip_path"]);
+
+                        var zip_path = data["zip_path"]
+                        var download_as = data["download_as"]
+
+                        //var delete_zip = data["delete_zip"]
+
+
+                        // Generate the download link
+                        //link = $("<a id="test" href="#" download="{{img}}" target="_blank">Download images here!</a>")
+                        //document.getElementById('downloader').innerHTML = "<a id="test" href="#" download="{{img}}" target="_blank">Download images here!</a>"
+
+                        var zip_name = data["zip_name"]
+                        var file_loc = "static/uploads/"+zip_name
+                        var a = document.createElement('a');
+                        a.setAttribute('href',file_loc);
+                        a.setAttribute('download',download_as);
+                        //a.setAttribute('onclick', delete_zip.apply_async([zip_path])
+                        a.innerHTML = "Download here";
+                        document.getElementById('progress').append(a);
+
+
+                        //$.ajax({
+                          //      url: 'delete.php',
+                            //    data: {'file' : "<?php echo dirname(__FILE__) . '/uploads/'?>" + file_name },
+                              //  success: function (response) {
+                                   // do something
+                                //},
+                                //error: function () {
+                                   // do something
+                                //}
+                              //});
+                    }
+                    else {
+                        // something unexpected happened
+                        $(status_div.childNodes[3]).text('Result: ' + data['state']);
+                    }
+                }
+                else {
+                    // rerun in 2 seconds
+                    setTimeout(function() {
+                        update_progress(status_url, nanobar, status_div);
+                    }, 2000);
+                }
+            });
+        }
+        $(function() {
+            $('#start-bg-job').submit(start_long_task);
+        });
+
+    </script>
+  </body>
+</html>
+
