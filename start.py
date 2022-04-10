@@ -1,5 +1,6 @@
 from Scrap2Infinity.app import app, UploadData, db
 from flask_apscheduler import APScheduler
+import os
 #
 # # initialize scheduler
 scheduler = APScheduler()

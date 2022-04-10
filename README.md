@@ -1,25 +1,22 @@
-Using Celery with Flask
+A quick introduction to this application: Google Image Scrapper
 =======================
 
-This repository contains the example code for my blog article [Using Celery with Flask](http://blog.miguelgrinberg.com/post/using-celery-with-flask).
+This repository contains the code for my web application [Scrap2Infinity](https://scrap2infinity.herokuapp.com/).
 
-The application provides two examples of background tasks using Celery:
+The application allows you to download any number of images from the web just by following these 4 steps:
 
-- Example 1 sends emails asynchronously.
-- Example 2 launches one or more asynchronous jobs and shows progress updates in the web page.
+1.  Input the image name you want to download
+2.  Input number of images you want to download
+3.  Hit the <i>download google images</i> button
+4.  Click on the <i>download here</i> link to download the required zip file
 
 Here is a screenshot of this application:
 
-<center><img src="http://blog.miguelgrinberg.com/static/images/flask-celery.png"></center>
+![scrap2infinity](https://user-images.githubusercontent.com/50429258/160291712-485581c9-a8ac-4181-800a-94c0b2ac2821.PNG)
 
-Quick Setup
------------
+![image](https://user-images.githubusercontent.com/50429258/160291831-55586b36-4174-49ce-bcc2-c1c216d1c6f6.png)
 
-1. Clone this repository.
-2. Create a virtualenv and install the requirements.
-3. Open a second terminal window and start a local Redis server (if you are on Linux or Mac, execute `run-redis.sh` to install and launch a private copy).
-4. Open a third terminal window. Set two environment variables `MAIL_USERNAME` and `MAIL_PASSWORD` to a valid Gmail account credentials (these will be used to send test emails). Then start a Celery worker: `venv/bin/celery -A app.celery worker --loglevel=info`.
-5. Start the Flask application on your original terminal window: `venv/bin/python app.py`.
-6. Go to `http://localhost:5000/` and enjoy this application!
+Click the <b>download google images</b> button:<br>
+![image](https://user-images.githubusercontent.com/50429258/160291867-83a112c8-e712-43fc-bf09-3c4c07d46f1e.png)
 
-For details on how this all works, see my article [Using Celery with Flask](http://blog.miguelgrinberg.com/post/using-celery-with-flask).
+Then click on Download here link, and a zip file containing those images will be downloaded.

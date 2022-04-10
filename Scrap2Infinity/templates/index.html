@@ -37,36 +37,12 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script>
 
-        //$(document).ready(function(){
-          //$("start-bg-job").on("submit", function(event){
-                  // Prevent default action by the form
-            //      event.preventDefault();
-
-                  // Get the form data
-              //    image = $("#image").val();
-                //  qty = $("#qty").val();
-
-                  // Start the function
-                  //start_long_task(image, qty);
-
-          //});
-        //});
-
-        //document.getElementbyId("start-bg-job").addEventListener("submit", start_long_task)
-
         function start_long_task(event) {
 
             // Prevent default action by the form
             event.preventDefault();
 
             // Get the form data
-            //var image = $("#image").val();
-            //var qty = $("#qty").val();
-
-
-            //var xhr = new XMLHttpRequest();
-            //xhr.open("post", "/longtask", true);
-            //xhr.setRequestHeader("Content-type", "application/json");
 
             // add task status elements
             div = $('<div class="progress"><div></div><div>0%</div><div>...</div><div>&nbsp;</div></div><hr>');
@@ -91,7 +67,7 @@
                     update_progress(status_url, nanobar, div[0]);
                 },
                 error: function() {
-                    alert("Can't download more than 5 images! Please refresh the page to download more...");
+                    alert("Some error has occured!");
                 }
             });
         }
@@ -105,41 +81,17 @@
                 $(status_div.childNodes[2]).text(data['status']);
                 if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
                     if ('result' in data) {
-                        // show result
-                        //$(status_div.childNodes[3]).text(data['result']);
-                        //$(status_div.childNodes[3]).text('Result: ' + "Download link");
-                        //$(status_div.childNodes[3]).text('Zip-Path: ' + data["zip_path"]);
-
                         var zip_path = data["zip_path"]
                         var download_as = data["download_as"]
 
-                        //var delete_zip = data["delete_zip"]
-
-
                         // Generate the download link
-                        //link = $("<a id="test" href="#" download="{{img}}" target="_blank">Download images here!</a>")
-                        //document.getElementById('downloader').innerHTML = "<a id="test" href="#" download="{{img}}" target="_blank">Download images here!</a>"
-
                         var zip_name = data["zip_name"]
                         var file_loc = "static/uploads/"+zip_name
                         var a = document.createElement('a');
                         a.setAttribute('href',file_loc);
                         a.setAttribute('download',download_as);
-                        //a.setAttribute('onclick', delete_zip.apply_async([zip_path])
                         a.innerHTML = "Download here";
                         document.getElementById('progress').append(a);
-
-
-                        //$.ajax({
-                          //      url: 'delete.php',
-                            //    data: {'file' : "<?php echo dirname(__FILE__) . '/uploads/'?>" + file_name },
-                              //  success: function (response) {
-                                   // do something
-                                //},
-                                //error: function () {
-                                   // do something
-                                //}
-                              //});
                     }
                     else {
                         // something unexpected happened
